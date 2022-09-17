@@ -8,7 +8,7 @@
 # コマンドライン
 コマンドラインからリモート操作できます。<br>
 
-* m2p -tocsnter<br>起動していたら画面中央に表示します。
+* m2p -tocenter<br>起動していたら画面中央に表示します。
 * m2p -exit<br>起動していたら終了させます。
 * m2p -mode [mm|dpi|pixel|mult]<br>入力位置を設定します。
 * m2p -value "1256"<br> 数値を設定します。
