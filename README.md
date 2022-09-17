@@ -12,6 +12,12 @@
 * m2p -exit<br>起動していたら終了させます。
 * m2p -mode [mm|dpi|pixel|mult]<br>入力位置を設定します。
 * m2p -value "1256"<br> 数値を設定します。
+* m2p -clip [mm|dpi|pixel|mult]<br>指定した数値をクリップボードへコピーします。
+
+```
+m2p -mode mm -value 100 -mode dpi -value 300 -clip pixel
+```
+と打ち込むと100mm、解像度300dpi のピクセル値をクリップボードにコピーします
 
 新しく作ったスケルトンの基本機能です。<br>
 
