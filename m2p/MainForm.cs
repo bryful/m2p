@@ -8,11 +8,6 @@ using System.Drawing.Text;
 
 namespace m2p
 {
-	public enum PIPECALL
-	{
-		StartupExec,
-		DoubleExec
-	}
 	public enum Mode
 	{
 		Mm,
@@ -577,6 +572,7 @@ namespace m2p
 			}
 		}
 		// *******************************************************************************
+		// *******************************************************************************
 		static public void ArgumentPipeServer(string pipeName)
 		{
 			Task.Run(() =>
@@ -601,7 +597,10 @@ namespace m2p
 							FormCollection apcl = Application.OpenForms;
 
 							if (apcl.Count > 0)
-								((MainForm)apcl[0]).Command(read.Split(";"), PIPECALL.DoubleExec); //取得した引数を送る
+							{
+								PipeData pd = new PipeData(read);
+								((MainForm)apcl[0]).Command(pd.GetArgs(), pd.GetPIPECALL()); //取得した引数を送る
+							}
 
 							if (!_execution)
 								break; //起動停止？
@@ -613,26 +612,8 @@ namespace m2p
 				}
 			});
 		}
-		// ******************************************************************************
-		public static Task ArgumentPipeClient(string pipeName, string[] args)
-		{
-			return Task.Run(() =>
-			{ //Taskを使ってサーバに送信waitで処理が終わるまで待つ
-				using (NamedPipeClientStream pipeClient = new NamedPipeClientStream(".", pipeName, PipeDirection.InOut, PipeOptions.None, System.Security.Principal.TokenImpersonationLevel.Impersonation))
-				{
-					StreamString ssCl;
-					string writeData;
-					pipeClient.Connect();
+		// ********************************************************************
 
-					ssCl = new StreamString(pipeClient);
-					writeData = string.Join(";", args); //送信する引数
-					ssCl.WriteString(writeData);
-#pragma warning disable CS8600 // Null リテラルまたは Null の可能性がある値を Null 非許容型に変換しています。
-					ssCl = null;
-#pragma warning restore CS8600 // Null リテラルまたは Null の可能性がある値を Null 非許容型に変換しています。
-				}
-			});
-		}
 
 		private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
 		{
@@ -643,47 +624,6 @@ namespace m2p
 		}
 
 	}
-	// ********************************************************************
-	public class StreamString
-	{
-		private System.IO.Stream ioStream;
-		private System.Text.UnicodeEncoding streamEncoding;
-		public StreamString(System.IO.Stream ioStream)
-		{
-			this.ioStream = ioStream;
-			streamEncoding = new System.Text.UnicodeEncoding();
-		}
 
-		// ********************************************************************
-		public string ReadString()
-		{
-			int len = 0;
-			len = ioStream.ReadByte() * 256; //テキスト長
-			len += ioStream.ReadByte(); //テキスト長余り
-			if (len > 0)
-			{ //テキストが格納されている
-				byte[] inBuffer = new byte[len];
-				ioStream.Read(inBuffer, 0, len); //テキスト取得
-				return streamEncoding.GetString(inBuffer);
-			}
-			else //テキストなし
-				return "";
-		}
-		// ********************************************************************
-		public int WriteString(string outString)
-		{
-			if (string.IsNullOrEmpty(outString))
-				return 0;
-			byte[] outBuffer = streamEncoding.GetBytes(outString);
-			int len = outBuffer.Length; //テキストの長さ
-			if (len > UInt16.MaxValue)
-				len = (int)UInt16.MaxValue; //65535文字
-			ioStream.WriteByte((byte)(len / 256)); //テキスト長
-			ioStream.WriteByte((byte)(len & 255)); //テキスト長余り
-			ioStream.Write(outBuffer, 0, len); //テキストを格納
-			ioStream.Flush();
-			return outBuffer.Length + 2; //テキスト＋２(テキスト長)
-		}
-	}
 	// ********************************************************************
 }

@@ -40,7 +40,7 @@ namespace BRY
 			// パスを取得
 			string path = String.Format(@"{0}\{1}",//\{2}
 			  Environment.GetFolderPath(folder),  // ベース・パス
-												  //Application.CompanyName,            // 会社名
+			  //Application.CompanyName,            // 会社名
 			  Application.ProductName
 			  );           // 製品名
 
@@ -65,7 +65,7 @@ namespace BRY
 		// ****************************************************
 		public Point GetPoint(string key, out bool ok)
 		{
-			Point ret = new Point(0, 0);
+			Point ret = new Point(0,0);
 			ok = false;
 			if ((key is not null) && (m_data is not null))
 			{
@@ -96,7 +96,7 @@ namespace BRY
 		// ****************************************************
 		public Rectangle GetRect(string key, out bool ok)
 		{
-			Rectangle ret = new Rectangle(0, 0, 0, 0);
+			Rectangle ret = new Rectangle(0, 0,0,0);
 			ok = false;
 			if ((key is not null) && (m_data is not null))
 			{
@@ -123,7 +123,7 @@ namespace BRY
 			m_data.Add(key, v);
 		}
 		// ****************************************************
-		public string GetValueString(string key, out bool ok)
+		public string GetValueString(string key ,out bool ok)
 		{
 			string ret = "";
 			ok = false;
@@ -173,7 +173,7 @@ namespace BRY
 		public void SetValue(string key, string[] v)
 		{
 			JsonArray array = new JsonArray();
-			foreach (string s in v)
+			foreach(string s in v)
 			{
 				array.Add(s);
 			}
@@ -188,8 +188,18 @@ namespace BRY
 			{
 				try
 				{
-					ret = m_data[key].GetValue<string[]>();
-					ok = true;
+					var ja = m_data?[key].AsArray();
+					if(ja.Count>0)
+					{
+						ret = new string[ja.Count];
+						int i = 0;
+						foreach(var s in ja)
+						{
+							ret[i] = s.GetValue<string>();
+							i++;
+						}
+						ok = true;
+					}
 				}
 				catch
 				{
@@ -219,8 +229,19 @@ namespace BRY
 			{
 				try
 				{
-					ret = m_data[key].GetValue<int[]>();
-					ok = true;
+					var ja = m_data?[key].AsArray();
+					if (ja.Count > 0)
+					{
+						ret = new int[ja.Count];
+						int i = 0;
+						foreach (var s in ja)
+						{
+							ret[i] = s.GetValue<int>();
+							i++;
+
+						}
+						ok = true;
+					}
 				}
 				catch
 				{
@@ -256,7 +277,7 @@ namespace BRY
 			}
 			return ret;
 
-		}
+		}       
 		// ****************************************************
 		public void SetValue(string key, bool[] v)
 		{
@@ -270,23 +291,33 @@ namespace BRY
 		// ****************************************************
 		public bool[] GetValueBoolArray(string key, out bool ok)
 		{
-			Boolean[] ret = new Boolean[0];
+			bool[] ret = new bool[0];
 			ok = false;
 			if ((key is not null) && (m_data is not null))
 			{
 				try
 				{
-					ret = m_data[key].GetValue<Boolean[]>();
-					ok = true;
+					var ja = m_data?[key].AsArray();
+					if (ja.Count > 0)
+					{
+						ret = new bool[ja.Count];
+						int i = 0;
+						foreach (var s in ja)
+						{
+							ret[i] = s.GetValue<bool>();
+							i++;
+
+						}
+						ok = true;
+					}
 				}
 				catch
 				{
-					ret = new Boolean[0];
+					ret = new bool[0];
 					ok = false;
 				}
 			}
 			return ret;
-
 		}
 		// ****************************************************
 		public string ToJson()
@@ -319,7 +350,7 @@ namespace BRY
 				{
 					if ((key is not null) && (m_data is not null))
 					{
-						ret = m_data[key].GetValue<JsonObject>();
+						ret =  m_data[key].GetValue<JsonObject>();
 					}
 				}
 				catch
@@ -415,7 +446,7 @@ namespace BRY
 			}
 			return ret;
 		}
-		static public bool ScreenIn(Point p, Size sz)
+		static public bool ScreenIn(Point p,Size sz)
 		{
 			return ScreenIn(new Rectangle(p, sz));
 		}
